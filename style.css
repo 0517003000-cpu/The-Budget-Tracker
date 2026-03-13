@@ -1,0 +1,117 @@
+body{
+font-family: Arial, sans-serif;
+background:#f4f4f4;
+margin:0;
+padding:20px;
+}
+
+/* main title */
+
+h1{
+text-align:center;
+margin-bottom:20px;
+}
+
+/* dashboard */
+
+#dashboard{
+text-align:center;
+margin-bottom:20px;
+}
+
+#docList{
+list-style:none;
+padding:0;
+margin-top:15px;
+}
+
+#docList li{
+margin:5px 0;
+}
+
+/* buttons */
+
+button{
+padding:10px 15px;
+border:none;
+background:#4CAF50;
+color:white;
+border-radius:5px;
+cursor:pointer;
+font-size:14px;
+}
+
+button:hover{
+background:#43a047;
+}
+
+/* editor */
+
+#editor{
+display:none;
+background:white;
+padding:20px;
+border-radius:6px;
+box-shadow:0 0 10px rgba(0,0,0,0.1);
+}
+
+/* title like google docs */
+
+#docTitle{
+margin-bottom:10px;
+outline:none;
+}
+
+/* income input */
+
+#income{
+margin-top:5px;
+margin-bottom:10px;
+padding:5px;
+width:200px;
+}
+
+/* table */
+
+table{
+border-collapse:collapse;
+width:100%;
+margin-top:20px;
+}
+
+td, th{
+border:1px solid black;
+padding:6px;
+text-align:left;
+}
+
+th{
+background:black;
+color:white;
+}
+
+.day{
+width:40px;
+text-align:center;
+}
+
+/* inputs inside table */
+
+table input{
+width:100%;
+border:none;
+outline:none;
+padding:4px;
+}
+
+/* totals */
+
+.totalBox{
+margin-top:20px;
+font-size:18px;
+}
+
+#status{
+font-weight:bold;
+margin-top:5px;
+}
