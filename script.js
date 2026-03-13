@@ -17,7 +17,8 @@ row.innerHTML = `
 <td><input class="savings" oninput="calculate()"></td>
 `;
 
-}
+} 
+
 
 
 // load documents in dashboard
