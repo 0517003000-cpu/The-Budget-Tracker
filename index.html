@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>BudgetWise - Monthly Budget Tracker</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f4f4;
+margin:0;
+padding:20px;
+}
+
+h1{
+text-align:center;
+}
+
+#dashboard{
+text-align:center;
+margin-bottom:20px;
+}
+
+button{
+padding:10px 15px;
+cursor:pointer;
+}
+
+#editor{
+display:none;
+background:white;
+padding:20px;
+}
+
+table{
+border-collapse:collapse;
+width:100%;
+margin-top:20px;
+}
+
+td, th{
+border:1px solid black;
+padding:6px;
+}
+
+th{
+background:black;
+color:white;
+}
+
+.day{
+width:40px;
+}
+
+input{
+width:100%;
+border:none;
+outline:none;
+}
+
+.totalBox{
+margin-top:20px;
+font-size:18px;
+}
+
+</style>
+</head>
+
+
+<body>
+
+<h1>BudgetWise</h1>
+
+<div id="dashboard">
+
+<h2>Your Budget Documents</h2>
+
+<button onclick="createDoc()">+ New Monthly Budget</button>
+
+<ul id="docList"></ul>
+
+</div>
+
+
+<div id="editor">
+
+<h2 contenteditable="true" id="docTitle">New Budget</h2>
+
+<label>Available Income (Rp)</label>
+<input type="number" id="income" oninput="calculate()">
+
+
+<table id="budgetTable">
+
+<tr>
+<th>Day</th>
+<th>Essential Expenses</th>
+<th>Non-Essential Expenses</th>
+<th>Savings</th>
+</tr>
+
+</table>
+
+<div class="totalBox">
+
+<p>Total Spending: Rp <span id="total">0</span></p>
+
+<p id="status"></p>
+
+</div>
+
+<button onclick="back()">← Back to Dashboard</button>
+
+</div>
+
+
+<script>
+
+let docs = JSON.parse(localStorage.getItem("budgetDocs")) || {};
+let currentDoc = null;
+
+
+// create 31 rows
+const table = document.getElementById("budgetTable");
+
+for(let i=1;i<=31;i++){
+
+let row = table.insertRow();
+
+row.innerHTML = `
+<td class="day">${i}</td>
+<td><input class="essential" oninput="calculate()"></td>
+<td><input class="nonessential" oninput="calculate()"></td>
+<td><input class="savings" oninput="calculate()"></td>
+`;
+
+}
+
+
+// dashboard list
+function loadDocs(){
+
+let list = document.getElementById("docList");
+list.innerHTML="";
+
+for(let key in docs){
+
+let li = document.createElement("li");
+
+li.innerHTML = `<button onclick="openDoc('${key}')">${key}</button>`;
+
+list.appendChild(li);
+
+}
+
+}
+
+loadDocs();
+
+
+// create document
+function createDoc(){
+
+let name = prompt("Enter month (example: March 2026)");
+
+if(!name) return;
+
+docs[name] = {};
+saveDocs();
+loadDocs();
+
+}
+
+
+// open document
+function openDoc(name){
+
+currentDoc = name;
+
+document.getElementById("dashboard").style.display="none";
+document.getElementById("editor").style.display="block";
+
+document.getElementById("docTitle").innerText = name;
+
+loadData();
+
+}
+
+
+// back
+function back(){
+
+saveData();
+
+document.getElementById("editor").style.display="none";
+document.getElementById("dashboard").style.display="block";
+
+}
+
+
+// calculate totals
+function calculate(){
+
+let total = 0;
+
+document.querySelectorAll("#budgetTable input").forEach(input=>{
+
+total += Number(input.value) || 0;
+
+});
+
+document.getElementById("total").innerText = total.toLocaleString("id-ID");
+
+let income = Number(document.getElementById("income").value) || 0;
+
+let status = document.getElementById("status");
+
+if(total > income){
+
+status.innerText = "⚠ Over Budget";
+
+status.style.color = "red";
+
+}else{
+
+status.innerText = "✔ Under Budget";
+
+status.style.color = "green";
+
+}
+
+saveData();
+
+}
+
+
+// save
+function saveDocs(){
+
+localStorage.setItem("budgetDocs", JSON.stringify(docs));
+
+}
+
+
+// save data
+function saveData(){
+
+if(!currentDoc) return;
+
+let data = {
+income: document.getElementById("income").value,
+inputs:[]
+};
+
+document.querySelectorAll("#budgetTable input").forEach(i=>{
+data.inputs.push(i.value);
+});
+
+docs[currentDoc] = data;
+
+saveDocs();
+
+}
+
+
+// load data
+function loadData(){
+
+let data = docs[currentDoc];
+
+if(!data) return;
+
+document.getElementById("income").value = data.income || "";
+
+let inputs = document.querySelectorAll("#budgetTable input");
+
+inputs.forEach((input,i)=>{
+input.value = data.inputs ? data.inputs[i] : "";
+});
+
+calculate();
+
+}
+
+</script>
+
+</body>
+</html>
