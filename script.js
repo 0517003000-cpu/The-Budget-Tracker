@@ -1,166 +1,95 @@
-// load saved documents
-let docs = JSON.parse(localStorage.getItem("budgetDocs")) || {};
-let currentDoc = null;
-
-
-// create 31 rows in the table
+// create 31 rows
 const table = document.getElementById("budgetTable");
 
-for (let i = 1; i <= 31; i++) {
+for(let i=1;i<=31;i++){
 
 let row = table.insertRow();
 
 row.innerHTML = `
-<td class="day">${i}</td>
+<td>${i}</td>
 <td><input class="essential" oninput="calculate()"></td>
 <td><input class="nonessential" oninput="calculate()"></td>
 <td><input class="savings" oninput="calculate()"></td>
 `;
 
-} 
-
-
-
-// load documents in dashboard
-function loadDocs(){
-
-let list = document.getElementById("docList");
-list.innerHTML = "";
-
-for(let key in docs){
-
-let li = document.createElement("li");
-
-li.innerHTML = `<button onclick="openDoc('${key}')">${key}</button>`;
-
-list.appendChild(li);
-
-}
-
-}
-
-loadDocs();
-
-
-// create a new monthly document
-function createDoc(){
-
-let name = prompt("Enter month (example: March 2026)");
-
-if(!name) return;
-
-docs[name] = {};
-saveDocs();
-loadDocs();
-
 }
 
 
-// open selected document
-function openDoc(name){
-
-currentDoc = name;
-
-document.getElementById("dashboard").style.display = "none";
-document.getElementById("editor").style.display = "block";
-
-document.getElementById("docTitle").innerText = name;
-
-loadData();
-
-}
-
-
-// go back to dashboard
-function back(){
-
-saveData();
-
-document.getElementById("editor").style.display = "none";
-document.getElementById("dashboard").style.display = "block";
-
-}
-
-
-// calculate total spending
+// main calculation
 function calculate(){
-
-let total = 0;
-
-document.querySelectorAll("#budgetTable input").forEach(input => {
-
-total += Number(input.value) || 0;
-
-});
-
-document.getElementById("total").innerText =
-total.toLocaleString("id-ID");
 
 let income = Number(document.getElementById("income").value) || 0;
 
-let status = document.getElementById("status");
 
-if(total > income){
+// 50 30 20 rule
+let essentialBudget = income * 0.5;
+let nonessentialBudget = income * 0.3;
+let savingsBudget = income * 0.2;
 
-status.innerText = "⚠ Over Budget";
+
+// show available funds
+document.getElementById("essentialBudget").innerText =
+essentialBudget.toLocaleString("id-ID");
+
+document.getElementById("nonessentialBudget").innerText =
+nonessentialBudget.toLocaleString("id-ID");
+
+document.getElementById("savingsBudget").innerText =
+savingsBudget.toLocaleString("id-ID");
+
+
+// calculate spending
+let essentialTotal = 0;
+let nonessentialTotal = 0;
+let savingsTotal = 0;
+
+
+document.querySelectorAll(".essential").forEach(e=>{
+essentialTotal += Number(e.value)||0;
+});
+
+document.querySelectorAll(".nonessential").forEach(e=>{
+nonessentialTotal += Number(e.value)||0;
+});
+
+document.querySelectorAll(".savings").forEach(e=>{
+savingsTotal += Number(e.value)||0;
+});
+
+
+// display totals
+document.getElementById("essentialTotal").innerText =
+essentialTotal.toLocaleString("id-ID");
+
+document.getElementById("nonessentialTotal").innerText =
+nonessentialTotal.toLocaleString("id-ID");
+
+document.getElementById("savingsTotal").innerText =
+savingsTotal.toLocaleString("id-ID");
+
+
+// over under budget
+updateStatus("essential", essentialTotal, essentialBudget);
+updateStatus("nonessential", nonessentialTotal, nonessentialBudget);
+updateStatus("savings", savingsTotal, savingsBudget);
+
+}
+
+
+function updateStatus(type,total,budget){
+
+let status = document.getElementById(type+"Status");
+
+if(total > budget){
+
+status.innerText = "Over Budget";
 status.style.color = "red";
 
 }else{
 
-status.innerText = "✔ Under Budget";
+status.innerText = "Under Budget";
 status.style.color = "green";
 
 }
-
-saveData();
-
-}
-
-
-// save document list
-function saveDocs(){
-
-localStorage.setItem("budgetDocs", JSON.stringify(docs));
-
-}
-
-
-// save current document data
-function saveData(){
-
-if(!currentDoc) return;
-
-let data = {
-income: document.getElementById("income").value,
-inputs: []
-};
-
-document.querySelectorAll("#budgetTable input").forEach(i => {
-data.inputs.push(i.value);
-});
-
-docs[currentDoc] = data;
-
-saveDocs();
-
-}
-
-
-// load saved document data
-function loadData(){
-
-let data = docs[currentDoc];
-
-if(!data) return;
-
-document.getElementById("income").value = data.income || "";
-
-let inputs = document.querySelectorAll("#budgetTable input");
-
-inputs.forEach((input, i) => {
-input.value = data.inputs ? data.inputs[i] : "";
-});
-
-calculate();
 
 }
